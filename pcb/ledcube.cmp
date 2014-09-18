@@ -1,0 +1,171 @@
+Cmp-Mod V01 Created by CvPcb (2014-03-19 BZR 4756)-product date = Thu 18 Sep 2014 09:27:32 PM CEST
+
+BeginCmp
+TimeStamp = /541B2745;
+Reference = C1;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B2731;
+Reference = C2;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B26E1;
+Reference = C3;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B26F5;
+Reference = C4;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B2709;
+Reference = C5;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B271D;
+Reference = C6;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B26CD;
+Reference = C7;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B26B9;
+Reference = C8;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B26A5;
+Reference = C9;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B2691;
+Reference = C10;
+ValeurCmp = C;
+IdModule  = SMD_Packages:SMD-0805;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B25EE;
+Reference = GND1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_1mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B2614;
+Reference = IN1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_1mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /541744F4;
+Reference = LED1;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /541744E0;
+Reference = LED2;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /541744CC;
+Reference = LED3;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /541744B8;
+Reference = LED4;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /541744A4;
+Reference = LED5;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /54174490;
+Reference = LED6;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /5417447C;
+Reference = LED7;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /54174468;
+Reference = LED8;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /54174454;
+Reference = LED9;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /54174440;
+Reference = LED10;
+ValeurCmp = WS2812B;
+IdModule  = WS2812:PLCC4-5050;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B2560;
+Reference = OUT1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_1mmDrill;
+EndCmp
+
+BeginCmp
+TimeStamp = /541B254C;
+Reference = VCC1;
+ValeurCmp = CONN_1;
+IdModule  = Wire_Pads:SolderWirePad_single_1mmDrill;
+EndCmp
+
+EndListe
