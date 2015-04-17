@@ -1,0 +1,94 @@
+Cmp-Mod V01 Created by Cvpcb (2015-04-16 BZR 5604)-product   date = Fri 17 Apr 2015 12:24:57 AM CEST
+
+BeginCmp
+TimeStamp = /552FFDE8;
+Reference = CONN1;
+ValeurCmp = IN;
+IdModule  = Terminal_Blocks:TerminalBlock_WAGO-804_RM5mm_3pol;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFDFC;
+Reference = CONN2;
+ValeurCmp = OUT;
+IdModule  = Terminal_Blocks:TerminalBlock_WAGO-804_RM5mm_3pol;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFE46;
+Reference = F1;
+ValeurCmp = FUSE;
+IdModule  = Fuse_Holders_and_Fuses:Fuseholder5x20_horiz_open_universal_Type-III;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFF5A;
+Reference = IC1;
+ValeurCmp = TL431LP;
+IdModule  = Housings_TO-92:TO-92_Horizontal1_Inline_Narrow_Oval;
+EndCmp
+
+BeginCmp
+TimeStamp = /5530014F;
+Reference = P1;
+ValeurCmp = POT;
+IdModule  = Potentiometers:Potentiometer_Trimmer-Piher-PT15-h2-5_vertical;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFEBA;
+Reference = R1;
+ValeurCmp = 8K2;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM10mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFECE;
+Reference = R2;
+ValeurCmp = 8K2;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM10mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFEE2;
+Reference = R3;
+ValeurCmp = 2K2;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM10mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFEF6;
+Reference = R4;
+ValeurCmp = 1K;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM10mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFF0A;
+Reference = R5;
+ValeurCmp = 1K;
+IdModule  = Resistors_ThroughHole:Resistor_Horizontal_RM10mm;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFF1E;
+Reference = T1;
+ValeurCmp = PNP;
+IdModule  = Housings_TO-92:TO-92_Horizontal1_Inline_Narrow_Oval;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFF32;
+Reference = T2;
+ValeurCmp = PNP;
+IdModule  = Housings_TO-92:TO-92_Horizontal1_Inline_Narrow_Oval;
+EndCmp
+
+BeginCmp
+TimeStamp = /552FFF46;
+Reference = T3;
+ValeurCmp = TYN1225;
+IdModule  = Transistors_TO-220:TO-220_Neutral123_Vertical;
+EndCmp
+
+EndListe
