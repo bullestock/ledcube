@@ -37,14 +37,14 @@
 extern "C" {
 #endif
 
-#define STM32_DELAY_US_MULT             20 /* FIXME: dummy value. */
+#define STM32_DELAY_US_MULT             2 /* FIXME: dummy value. */
 
 /**
  * @brief Delay the given number of microseconds.
  *
  * @param us Number of microseconds to delay.
  */
-static inline void delay_us(uint32_t us) {
+static inline void delay_us(int us) {
     us *= STM32_DELAY_US_MULT;
 
     /* fudge for function call overhead  */

@@ -1,4 +1,7 @@
 #include <stm32f10x.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "delay.h"
 #include "systick.h"
@@ -31,6 +34,11 @@ static inline uint32_t micros()
 #undef US_PER_MS
 }
 
+static double abs(double val)
+{
+    return val > 0 ? val : -val;
+}
+
 void setPixelColor(unsigned char* buf, uint16_t n, uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t *p = &buf[n * 3];
@@ -52,28 +60,42 @@ void setPixelColor(unsigned char* buf, uint16_t n, uint32_t c)
     *p = b;
 }
 
-uint32_t endTime = 0;
+const int SIDE = 8;
+
+struct color
+{
+    color(unsigned char r = 0,
+          unsigned char g = 0,
+          unsigned char b = 0)
+        : red(r),
+          green(g),
+          blue(b)
+    {
+    }
+    
+    unsigned char red, green, blue;
+};
+
+// Sets a pixel at position (x,y,z) to the col parameter's color
+void setPixel(unsigned char* buf, int x, int y, int z, const color& c)
+{
+    // TODO: handle flipped strips
+    int index = (z*SIDE*SIDE) + (x*SIDE) + y;
+    setPixelColor(buf, index, c.red, c.green, c.blue);
+}
+
+void updateFireworks(unsigned char* buf);
+float distance(float x, float y, float z, float x1, float y1, float z1);
+void prepRocket();
+void initFireworks();
 
 void show(unsigned char* buf, uint16_t n, GPIO_TypeDef* gpio, int pin)
 {
-  // Data latch = 24 or 50 microsecond pause in the output stream.  Rather than
-  // put a delay at the end of the function, the ending time is noted and
-  // the function will simply hold off (if needed) on issuing the
-  // subsequent round of data until the latch time has elapsed.  This
-  // allows the mainline code to start generating the next frame of data
-  // rather than stalling for the latch.
-  uint32_t waitime = 50; // wait time in microseconds.
-
-  //!!  while ((micros() - endTime) < waitime);
-
   __disable_irq(); // Need 100% focus on instruction timing
-
-  int numBytes = n*3;
 
   volatile uint32_t 
     c,    // 24-bit pixel color
     mask; // 8-bit mask
-  volatile uint16_t i = numBytes; // Output loop counter
   volatile uint8_t
     j,              // 8-bit inner loop counter
    *ptr = buf,   // Pointer to next byte
@@ -81,9 +103,9 @@ void show(unsigned char* buf, uint16_t n, GPIO_TypeDef* gpio, int pin)
     r,              // Current red byte value
     b;              // Current blue byte value
   
-  while(i) { // While bytes left... (3 bytes = 1 pixel)
+  while (n--)
+  {
       mask = 0x800000; // reset the mask
-      i = i-3;      // decrement bytes remaining
       g = *ptr++;   // Next green byte value
       r = *ptr++;   // Next red byte value
       b = *ptr++;   // Next blue byte value
@@ -141,7 +163,6 @@ void show(unsigned char* buf, uint16_t n, GPIO_TypeDef* gpio, int pin)
   } // end while(i) ... no more pixels
 
   __enable_irq();
-  endTime = micros(); // Save EOD time for latch on next call
 }
 
 // Convert separate R,G,B into packed 32-bit RGB color.
@@ -168,6 +189,56 @@ uint32_t Wheel(uint8_t WheelPos)
     }
 }
 
+color wheel(uint8_t pos)
+{
+    if (pos < 85)
+    {
+        return color(pos * 3, 255 - pos * 3, 0);
+    }
+    else if(pos < 170)
+    {
+        pos -= 85;
+        return color(255 - pos * 3, 0, pos * 3);
+    }
+    else
+    {
+        pos -= 170;
+        return color(0, pos * 3, 255 - pos * 3);
+    }
+}
+
+void ShowBuffer(unsigned char* buf)
+{
+    for (int p = 0; p < 8; ++p)
+    {
+        show(buf+SIDE*SIDE*p*3, SIDE*SIDE, GPIOA, 1 << p);
+    }
+}
+
+void delay_ms(int ms)
+{
+    for (int i = 0; i < ms; ++i)
+        delay_us(1000);
+}
+
+void Fade(unsigned char* buf)
+{
+    for (int i = 0; i < 50; ++i)
+    {
+        for (int idx = 0; idx < SIDE*SIDE*SIDE*3; ++idx)
+        {
+            char v = buf[idx];
+            if (v > 32)
+                v *= 0.8;
+            else
+                v /= 2;
+            buf[idx] = v;
+        }
+        ShowBuffer(buf);
+        delay_ms(100);
+    }
+}
+
 int main()
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -179,7 +250,11 @@ int main()
 	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;  //this sets the GPIO modules clock speed
 	GPIO_Init(GPIOA, &GPIO_InitStruct);			    // this passes the configuration to the Init function which takes care of the low level stuff
 
-    unsigned char buf[8*8*3];
+    unsigned char buf[8*8*8*3];
+    memset(buf, 0, sizeof(buf));
+    ShowBuffer(buf);
+    delay_ms(1);
+
 #if 0
     GPIO_TypeDef* gpio = GPIOA;
     while (1)
@@ -189,23 +264,214 @@ int main()
         gpio->ODR = 0;
         delay_us(5000);
     }
-#else
+#endif
+
+#if 0
+    // Test
     while (1)
     {
-        for (int i = 0; i < 255; ++i)
+        for (int c = 8; c < 32; ++c)
         {
-            for (int j = 0; j < 8*8; ++j)
+            for (int j = 0; j < SIDE*SIDE*SIDE; ++j)
             {
-                setPixelColor(buf, j, Wheel((i+j) & 255));
+                color C = wheel(c);
+                buf[j*3] = C.red;
+                buf[j*3+1] = C.green;
+                buf[j*3+2] = C.blue;
             }
-            for (int p = 0; p < 8; ++p)
-            {
-                show(buf, 8*8, GPIOA, 1 << p);
-            }
+            ShowBuffer(buf);
             delay_us(5000);
         }
     }
 #endif
+
+    const int numShows = 3;
+    const int iterDelay = 1;
+    
+#if 0
+    // Rainbow
+    for (int n = 0; n < numShows; ++n)
+    {
+        for (int i = 0; i < 255; ++i)
+        {
+            for (int j = 0; j < SIDE*SIDE*SIDE; ++j)
+            {
+                setPixelColor(buf, j, Wheel((i+j) & 255));
+            }
+            ShowBuffer(buf);
+            if (iterDelay)
+                delay_us(iterDelay);
+        }
+    }
+#endif
+
+    Fade(buf);
+
+#if 0
+    // Rainbow wipe
+    for (int n = 0; n < numShows; ++n)
+    {
+        for (int c = 0; c < 255; ++c)
+        {
+            for (int j = 0; j < SIDE*SIDE*SIDE; ++j)
+            {
+                setPixelColor(buf, j, Wheel(c));
+            }
+            ShowBuffer(buf);
+            if (iterDelay)
+                delay_us(iterDelay);
+        }
+    }
+#endif
+
+    Fade(buf);
+
+#if 1
+    // Epilectic fit
+    for (int n = 0; n < numShows*10; ++n)
+    {
+        memset(buf, 16, sizeof(buf));
+        ShowBuffer(buf);
+        delay_ms(1);
+        memset(buf, 0, sizeof(buf));
+        ShowBuffer(buf);
+        delay_ms(10);
+    }
+#endif
+
+    Fade(buf);
+
+#if 0
+    // Chase single pixel
+    int index = 0;
+    for (int n = 0; n < numShows; ++n)
+    {
+        memset(buf, 0, sizeof(buf));
+        setPixelColor(buf, index, 255, 255, 255);
+        ShowBuffer(buf);
+        ++index;
+        if (index > SIDE*SIDE*SIDE)
+            index = 0;
+        if (iterDelay)
+            delay_us(iterDelay);
+        delay_us(100);
+    }
+
+    Fade(buf);
+#endif
+
+    initFireworks();
+    while (1)
+    {
+        setPixelColor(buf, 0, 16, 32, 64);
+        setPixelColor(buf, 42, 16, 32, 64);
+        setPixelColor(buf, 117, 16, 32, 64);
+        setPixelColor(buf, 245, 16, 32, 64);
+        setPixelColor(buf, 333, 16, 32, 64);
+        //updateFireworks(buf);
+        ShowBuffer(buf);
+        //if (iterDelay)
+            delay_ms(100);
+    }
+}
+
+/******************************
+ * fireworks variables *
+ * ****************************/
+color black;
+int centerX, centerY, centerZ;
+int launchX, launchZ;
+int red, green, blue;
+int brightness=35;
+float radius=0;
+float speed;
+bool showRocket;
+bool exploded;
+float xInc, yInc, zInc;
+float rocketX, rocketY, rocketZ;
+float launchTime;
+int maxSize;
+color rocketColor, fireworkColor;
+
+void updateFireworks(unsigned char* buf)
+{
+#if 0
+    //loop through all the pixels, calculate the distance to the center point, and turn the pixel on if it's at the right radius
+    for(int x=0;x<SIDE;x++)
+        for(int y=0;y<SIDE;y++) 
+            for(int z=0;z<SIDE;z++)
+            {
+                if(showRocket)
+                    if(abs(distance(x,y,z,rocketX, rocketY, rocketZ)-radius)<0.05)
+                        setPixel(buf, x,y,z, rocketColor);                
+                if(exploded)
+                    if(abs(distance(x,y,z,centerX, centerY, centerZ)-radius)<0.1)
+                        setPixel(buf, x,y,z, fireworkColor);
+            }
+
+    if(exploded)
+        radius+=speed;  //the sphere gets bigger
+    if(showRocket)
+    {
+        rocketX+=xInc;
+        rocketY+=yInc;
+        rocketZ+=zInc;
+    }
+    //if our sphere gets too large, restart the animation in another random spot
+    if(radius>maxSize)
+        prepRocket();
+    if(abs(distance(centerX,centerY,centerZ,rocketX, rocketY, rocketZ)-radius)<2)
+    {
+        showRocket=false;
+        exploded=true;
+    }
+#endif
+    for(int x=0;x<SIDE;x++)
+        for(int y=0;y<SIDE;y++) 
+            for(int z=0;z<SIDE;z++)
+            {
+                //setPixel(buf, x,y,z, rocketColor);
+                setPixelColor(buf, x*8+y*8*8+z, 16, 32, 64);
+            }
+}
+
+float distance(float x, float y, float z, float x1, float y1, float z1)
+{
+    return 0.0;//!!(sqrt(pow(x-x1,2)+pow(y-y1,2)+pow(z-z1,2)));
+}
+
+void prepRocket()
+{
+    radius=0;
+    centerX=rand()%8;
+    centerY=rand()%8;
+    centerZ=rand()%8;
+    fireworkColor.red=rand()%brightness;
+    fireworkColor.green=rand()%brightness;
+    fireworkColor.blue=rand()%brightness;
+    launchX=rand()%8;
+    launchZ=rand()%8;
+    rocketX=launchX;
+    rocketY=0;
+    rocketZ=launchZ;
+    launchTime=15+rand()%25;
+    xInc=(centerX-rocketX)/launchTime;
+    yInc=(centerY-rocketY)/launchTime;
+    zInc=(centerZ-rocketZ)/launchTime;
+    showRocket=true;
+    exploded=false;
+    speed=0.15;
+    maxSize=2+rand()%6;
+    //speed=rand()%5;
+    //speed*=0.1;
+}
+
+void initFireworks()
+{
+    rocketColor.red=255;
+    rocketColor.green=150;
+    rocketColor.blue=100;
+    prepRocket();
 }
 
 extern "C" void _exit()

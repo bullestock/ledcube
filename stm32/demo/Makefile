@@ -64,7 +64,7 @@ CFLAGS	= $(MCFLAGS)  $(OPTIMIZE)  $(DEFS) -I. -I./ $(STM32_INCLUDES)  -Wl,-T,stm
 AFLAGS	= $(MCFLAGS) 
 
 SRC = main.cpp \
-	stm32f10x_it.c systick.c \
+	stm32f10x_it.c systick.c delay.h \
 	system_stm32f10x.c \
 	../Libraries/STM32F10x_StdPeriph_Driver/src/misc.c \
 	../Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_adc.c \
