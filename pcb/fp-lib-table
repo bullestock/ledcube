@@ -1,3 +1,0 @@
-(fp_lib_table
-  (lib (name WS2812)(type Legacy)(uri /home/torsten/pcb/libs/PLCC4-5050.mod)(options "")(descr ""))
-)
