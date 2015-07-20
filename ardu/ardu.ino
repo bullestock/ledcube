@@ -1,4 +1,4 @@
-#include <Adafruit_NeoPixel.h>
+#include "Adafruit_NeoPixel.h"
 
 #define PIN 6
 
@@ -9,7 +9,7 @@
 //   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
 
 // IMPORTANT: To reduce NeoPixel burnout risk, add 1000 uF capacitor across
 // pixel power leads, add 300 - 500 Ohm resistor on first pixel's data input
@@ -31,16 +31,21 @@ void loop() {
       for (b = 64; b < 256; b += 8)
         theaterChase(strip.Color(r, g, b), del);
   */
-
-  for (int c = 0; c < 256; ++c)
+#if 0
+  for (int c = 5; c > 0; --c)
   {
     for(uint16_t i=0; i<strip.numPixels(); i++)
-      strip.setPixelColor(i, Wheel(c));
+        strip.setPixelColor(i, strip.Color(255, 255, 255));
     strip.show();
-    delay(del);
+    delay(500);
+    for(uint16_t i=0; i<strip.numPixels(); i++)
+        strip.setPixelColor(i, strip.Color(0, 0, 0));
+    strip.show();
+    delay(500);
   }
-  
-  /*
+#endif
+
+#if 0
   // Some example procedures showing how to display to the pixels:
   colorWipe(strip.Color(255, 0, 0), del); // Red
   colorWipe(strip.Color(0, 255, 0), del); // Green
@@ -54,7 +59,14 @@ void loop() {
   rainbow(20);
   rainbowCycle(20);
   theaterChaseRainbow(50);
-  */
+#endif
+  int i;
+  for (i = 0; i < 255; i += 2)
+  {
+      strip.setPixelColor(0, strip.Color(255-i, 0, 0));
+      strip.show();
+      delay(50);
+  }
 }
 
 // Fill the dots one after the other with a color
