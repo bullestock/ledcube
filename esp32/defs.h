@@ -1,0 +1,3 @@
+const int NUM_LEDS_PER_STRAND = 8*8;
+const int NUM_OF_STRANDS = 1; //8;
+const int NUM_LEDS = NUM_OF_STRANDS * NUM_LEDS_PER_STRAND;
