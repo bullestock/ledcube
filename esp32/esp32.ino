@@ -43,7 +43,7 @@ WiFiUDP Udp;
 
 // Pins for controlling strands
 constexpr int PixelPins[] = {
-    2, 0, 0, 0, 0, 0, 0, 0
+    13, 0, 0, 0, 0, 0, 0, 0
 };
 
 const int BRIGHTNESS = 25; // percent
