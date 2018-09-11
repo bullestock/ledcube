@@ -36,4 +36,4 @@ bool FrameLimiter::skip()
   return false;
 }
 
-int FrameLimiter::fps = 10;
+int FrameLimiter::fps = 5;
