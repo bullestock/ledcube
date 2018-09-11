@@ -34,7 +34,7 @@ void neomatrix_init()
 #define FADEIN FADETIME
 #define FADEOUT (RUNTIME-FADETIME)
 
-static int max_brightness = 255;
+static int max_brightness = BRIGHTNESS;
 static bool night_mode = false;
 
 bool run_autonomously = true;
