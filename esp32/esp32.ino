@@ -43,10 +43,8 @@ WiFiUDP Udp;
 
 // Pins for controlling strands
 constexpr int PixelPins[] = {
-    13, 0, 0, 0, 0, 0, 0, 0
+    13, 12, 14, 27, 26, 25, 33, 32
 };
-
-const int BRIGHTNESS = 25; // percent
 
 // Main animation buffer
 CRGB* leds = nullptr;
@@ -156,7 +154,6 @@ void parse_pixel_data(uint8_t* data, int size)
     {
         run_autonomously = false;
         Serial.println("Switch to non-autonomous mode");
-        FastLED.setBrightness(255);
     }
     
     auto cmdptr = (int16_t*) data;
