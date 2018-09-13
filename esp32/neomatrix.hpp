@@ -10,6 +10,7 @@
 void neomatrix_init();
 void neomatrix_run();
 void neomatrix_change_program(const char* name);
+void neomatrix_next_program();
 void neomatrix_set_speed(int fps);
 void neomatrix_start_autorun();
 void neomatrix_set_brightness(uint8_t brightness);

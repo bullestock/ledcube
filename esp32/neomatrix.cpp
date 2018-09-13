@@ -11,6 +11,7 @@
 
 #include "common.hpp"
 #include "display.hpp"
+#include "neomatrix.hpp"
 #include "program.hpp"
 
 Program* current = nullptr;
@@ -68,12 +69,7 @@ void program_loop()
 
         do
         {
-            currentFactory = currentFactory->next;
-            if (!currentFactory)
-                currentFactory = ProgramFactory::first;
-            current = currentFactory->launch();
-            Serial.print("Launched ");
-            Serial.println(currentFactory->name);
+            neomatrix_next_program();
         }
         while (night_mode && !current->allow_night_mode());
 
@@ -105,6 +101,16 @@ void neomatrix_change_program(const char* name)
     clear_all();
     FastLED.setBrightness(max_brightness);
 }
+
+void neomatrix_next_program()
+{
+    currentFactory = currentFactory->next;
+    if (!currentFactory)
+        currentFactory = ProgramFactory::first;
+    current = currentFactory->launch();
+    Serial.print("Launched ");
+    Serial.println(currentFactory->name);
+ }
 
 void neomatrix_set_speed(int fps)
 {

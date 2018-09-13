@@ -45,6 +45,8 @@ WiFiUDP Udp;
 constexpr int PixelPins[] = {
     13, 12, 14, 27, 26, 25, 33, 32
 };
+const int ButtonPin = 35;
+const int DEBOUNCE_TIME_MS = 100;
 
 // Main animation buffer
 CRGB* leds = nullptr;
@@ -62,6 +64,21 @@ void setup()
     ADD_STRAND(0);
 #if NUM_OF_STRANDS > 1
     ADD_STRAND(1);
+#endif
+#if NUM_OF_STRANDS > 2
+    ADD_STRAND(2);
+#endif
+#if NUM_OF_STRANDS > 3
+    ADD_STRAND(3);
+#endif
+#if NUM_OF_STRANDS > 4
+    ADD_STRAND(4);
+#endif
+#if NUM_OF_STRANDS > 5
+    ADD_STRAND(5);
+#endif
+#if NUM_OF_STRANDS > 6
+    ADD_STRAND(6);
 #endif
     FastLED.setBrightness(BRIGHTNESS);
 
@@ -272,6 +289,10 @@ void show()
 
 void loop()
 {
+    static bool last_pressed = false;
+    static bool button_state = false;
+    static unsigned long last_debounce = 0;
+    
     clientEventUdp();
 
     neomatrix_run();
@@ -281,4 +302,16 @@ void loop()
         show();
         dirtyshow = false;
     }
+
+    const bool pressed = !digitalRead(ButtonPin);
+    if (pressed != last_pressed)
+        last_debounce = millis();
+    if (millis() - last_debounce > DEBOUNCE_TIME_MS)
+        if (pressed != button_state)
+        {
+            button_state = pressed;
+            if (button_state)
+                neomatrix_next_program();
+        }
+    last_pressed = pressed;
 }
