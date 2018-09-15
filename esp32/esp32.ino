@@ -18,14 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#define FASTLED_ALLOW_INTERRUPTS 0
-#include <FastLED.h>
+#include "esp32_digital_led_lib.h"
 
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <Wire.h>
 
-#include "defs.h"
+#include "display.hpp"
 #include "neomatrix.hpp"
 
 const char* version = "0.0.1";
@@ -48,18 +47,53 @@ constexpr int PixelPins[] = {
 const int ButtonPin = 35;
 const int DEBOUNCE_TIME_MS = 100;
 
-// Main animation buffer
-CRGB* leds = nullptr;
-
 void clear_all();
 void show();
 
-#define ADD_STRAND(i)   \
-    FastLED.addLeds<WS2811, PixelPins[i], GRB>(leds + i * NUM_LEDS_PER_STRAND, NUM_LEDS_PER_STRAND).setCorrection(TypicalLEDStrip)
+#define DEFINE_STRAND(i)                        \
+    strand_t strand_##i = {                     \
+        .rmtChannel = i,                        \
+        .gpioNum = PixelPins[i],                \
+        .ledType = LED_WS2812B_V3,              \
+        .brightLimit = BRIGHTNESS,              \
+        .numPixels = NUM_LEDS_PER_STRAND,       \
+        .pixels = nullptr,                      \
+        ._stateVars = nullptr}
+
+#define ADD_STRAND(i)   strands[i] = &strand_##i
+
+strand_t* strands[NUM_OF_STRANDS];
+pixelColor_t* pixels[NUM_OF_STRANDS];
+
+DEFINE_STRAND(0);
+#if NUM_OF_STRANDS > 1
+DEFINE_STRAND(1);
+#endif
+#if NUM_OF_STRANDS > 2
+DEFINE_STRAND(2);
+#endif
+#if NUM_OF_STRANDS > 3
+DEFINE_STRAND(3);
+#endif
+#if NUM_OF_STRANDS > 4
+DEFINE_STRAND(4);
+#endif
+#if NUM_OF_STRANDS > 5
+DEFINE_STRAND(5);
+#endif
+#if NUM_OF_STRANDS > 6
+DEFINE_STRAND(6);
+#endif
+
 
 void setup()
 {
-    leds = new CRGB[NUM_LEDS];
+    delay(1000);
+    Serial.begin(115200);
+    Serial.print("\r\nRGB LED Cube ");
+    Serial.println(version);
+
+    pinMode(ButtonPin, INPUT_PULLUP);
 
     ADD_STRAND(0);
 #if NUM_OF_STRANDS > 1
@@ -80,14 +114,18 @@ void setup()
 #if NUM_OF_STRANDS > 6
     ADD_STRAND(6);
 #endif
-    FastLED.setBrightness(BRIGHTNESS);
 
-    delay(1000);
-    Serial.begin(115200);
-    Serial.print("\r\nRGB LED Cube ");
-    Serial.println(version);
-    delay(1000);
-
+    for (int i = 0; i < NUM_OF_STRANDS; ++i)
+    {
+        if (digitalLeds_initStrands(strands[i], 1))
+        {
+            Serial.println("Strand init failure");
+            while (1)
+                ;
+        }
+        pixels[i] = strands[i]->pixels;
+    }
+    
 #if 0
     
     // Connect to WiFi network
@@ -152,7 +190,6 @@ void setup()
     
     clear_all();
     show();
-    
     neomatrix_init();
 }
 
@@ -180,7 +217,7 @@ void parse_pixel_data(uint8_t* data, int size)
     int offset = *cmdptr;
     //Serial.printf("Offset: %i, Size: %i\n", offset, size / 3);
     for (int i = offset; i < std::min(offset + nof_leds, NUM_LEDS); ++i)
-        leds[i] = CRGB(*pixrgb++, *pixrgb++, *pixrgb++);
+        set_pixel(i, pixelFromRGB(*pixrgb++, *pixrgb++, *pixrgb++));
     dirtyshow = true;
 }
 
@@ -273,30 +310,33 @@ void clientEventUdp()
         default:
             break;
         }
-            
     }
 }
 
 void clear_all()
 {
-    memset(leds, 0, NUM_LEDS * 3);
+    for (int i = 0; i < NUM_OF_STRANDS; ++i)
+        memset(strands[i]->pixels, 0, NUM_LEDS_PER_STRAND * sizeof(pixelColor_t));
 }
 
 void show()
 {
-    FastLED.show();
+    for (int i = 0; i < NUM_OF_STRANDS; ++i)
+        digitalLeds_updatePixels(strands[i]);
 }
 
+int p = 0;
 void loop()
 {
     static bool last_pressed = false;
     static bool button_state = false;
     static unsigned long last_debounce = 0;
-    
+
     clientEventUdp();
 
     neomatrix_run();
-    
+    delay(10);
+
     if (dirtyshow)
     {
         show();
@@ -310,6 +350,8 @@ void loop()
         if (pressed != button_state)
         {
             button_state = pressed;
+            Serial.print("Button: ");
+            Serial.println(button_state);
             if (button_state)
                 neomatrix_next_program();
         }

@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #include "program.hpp"
 #include "display.hpp"
 
@@ -6,7 +8,7 @@ class RowTest : public Program
 {
 public:
     RowTest()
-        : Program(5)
+        : Program(2)
     {
     }
 
@@ -15,8 +17,10 @@ public:
         if (limiter.skip()) return false;
 
         if (idx > 0)
-            leds[idx-1] = CRGB(0, 0, 0);
-        leds[idx] = CRGB(0, 255, 0);
+            set_pixel(idx-1, pixelFromRGB(0, 0, 0));
+        if (idx >= NUM_LEDS)
+            idx = 0;
+        set_pixel(idx, pixelFromRGB(0, 255, 0));
         ++idx;
         return true;
     }

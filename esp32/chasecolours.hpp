@@ -5,7 +5,7 @@
 class ChaseColours
 {
 public:
-    static CRGB get()
+    static pixelColor_t get()
     {
         return chase_colours[idx];
     }
@@ -14,5 +14,5 @@ public:
 
 private:
     static int idx;
-    static const CRGB chase_colours[];
+    static const pixelColor_t chase_colours[];
 };

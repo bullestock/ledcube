@@ -1,6 +1,61 @@
 #include "program.hpp"
 #include "display.hpp"
 
+#define LIB8STATIC __attribute__ ((unused)) static inline
+#define LIB8STATIC_ALWAYS_INLINE __attribute__ ((always_inline)) static inline
+typedef uint8_t   fract8;   ///< ANSI: unsigned short _Fract
+typedef uint16_t  fract16;  ///< ANSI: unsigned       _Fract
+
+#define RAND16_SEED  1337
+uint16_t rand16seed = RAND16_SEED;
+
+#include "math8.h"
+#include "random8.h"
+
+// Approximates a 'black body radiation' spectrum for
+// a given 'heat' level.  This is useful for animations of 'fire'.
+// Heat is specified as an arbitrary scale from 0 (cool) to 255 (hot).
+// This is NOT a chromatically correct 'black body radiation'
+// spectrum, but it's surprisingly close, and it's fast and small.
+
+pixelColor_t HeatColor( uint8_t temperature)
+{
+    // Scale 'heat' down from 0-255 to 0-191,
+    // which can then be easily divided into three
+    // equal 'thirds' of 64 units each.
+    uint8_t t192 = scale8_video( temperature, 191);
+
+    // calculate a value that ramps up from
+    // zero to 255 in each 'third' of the scale.
+    uint8_t heatramp = t192 & 0x3F; // 0..63
+    heatramp <<= 2; // scale up to 0..252
+
+    pixelColor_t heatcolor;
+    heatcolor.w = 0;
+    
+    // now figure out which third of the spectrum we're in:
+    if( t192 & 0x80) {
+        // we're in the hottest third
+        heatcolor.r = 255; // full red
+        heatcolor.g = 255; // full green
+        heatcolor.b = heatramp; // ramp up blue
+
+    } else if( t192 & 0x40 ) {
+        // we're in the middle third
+        heatcolor.r = 255; // full red
+        heatcolor.g = heatramp; // ramp up green
+        heatcolor.b = 0; // no blue
+
+    } else {
+        // we're in the coolest third
+        heatcolor.r = heatramp; // ramp up red
+        heatcolor.g = 0; // no green
+        heatcolor.b = 0; // no blue
+    }
+
+    return heatcolor;
+}
+
 // Fire2012 by Mark Kriegsman, July 2012
 // as part of "Five Elements" shown here: http://youtu.be/knWiGsmgycY
 //// 
@@ -46,7 +101,7 @@ public:
     Fire()
         : Program(1)
     {
-        heat = new byte[NUM_LEDS];
+        heat = new uint8_t[NUM_LEDS];
     }
 
     virtual ~Fire()
@@ -82,14 +137,14 @@ public:
 
         // Step 4.  Map from heat cells to LED colors
         for (int j = 0; j < NUM_LEDS; j++)
-            leds[j] = HeatColor(heat[j]);
+            set_pixel(j, HeatColor(heat[j]));
 
         return true;
     }
 
 private:
     // Array of temperature readings at each simulation cell
-    byte* heat;
+    uint8_t* heat;
 };
 
 REGISTER_PROGRAM(Fire);
