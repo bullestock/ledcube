@@ -210,6 +210,20 @@ void digitalLeds_resetPixels(strand_t * pStrand)
   digitalLeds_updatePixels(pStrand);
 }
 
+int brightness = 256;
+
+void digitalLeds_setBrightness(int b)
+{
+    if ((b < 0) || (b > 256))
+        return;
+    brightness = b;
+}
+
+uint8_t apply_brightness(uint8_t v)
+{
+    return v * brightness / 256;
+}
+
 int IRAM_ATTR digitalLeds_updatePixels(strand_t * pStrand)
 {
   digitalLeds_stateData * pState = static_cast<digitalLeds_stateData*>(pStrand->_stateVars);
@@ -219,18 +233,18 @@ int IRAM_ATTR digitalLeds_updatePixels(strand_t * pStrand)
   if (ledParams.bytesPerPixel == 3) {
     for (uint16_t i = 0; i < pStrand->numPixels; i++) {
       // Color order is translated from RGB to GRB
-      pState->buf_data[0 + i * 3] = pStrand->pixels[i].g;
-      pState->buf_data[1 + i * 3] = pStrand->pixels[i].r;
-      pState->buf_data[2 + i * 3] = pStrand->pixels[i].b;
+        pState->buf_data[0 + i * 3] = apply_brightness(pStrand->pixels[i].g);
+        pState->buf_data[1 + i * 3] = apply_brightness(pStrand->pixels[i].r);
+        pState->buf_data[2 + i * 3] = apply_brightness(pStrand->pixels[i].b);
     }
   }
   else if (ledParams.bytesPerPixel == 4) {
     for (uint16_t i = 0; i < pStrand->numPixels; i++) {
       // Color order is translated from RGBW to GRBW
-      pState->buf_data[0 + i * 4] = pStrand->pixels[i].g;
-      pState->buf_data[1 + i * 4] = pStrand->pixels[i].r;
-      pState->buf_data[2 + i * 4] = pStrand->pixels[i].b;
-      pState->buf_data[3 + i * 4] = pStrand->pixels[i].w;
+        pState->buf_data[0 + i * 4] = apply_brightness(pStrand->pixels[i].g);
+        pState->buf_data[1 + i * 4] = apply_brightness(pStrand->pixels[i].r);
+        pState->buf_data[2 + i * 4] = apply_brightness(pStrand->pixels[i].b);
+        pState->buf_data[3 + i * 4] = apply_brightness(pStrand->pixels[i].w);
     }    
   }
   else {

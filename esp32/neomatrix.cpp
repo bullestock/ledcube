@@ -41,28 +41,24 @@ static bool night_mode = false;
 bool run_autonomously = true;
 bool auto_program_switch = true;
 
-void set_brightness(int brightness)
-{
-}
-
 void program_loop()
 {
     uint32_t now = millis();
     uint32_t prgTime = now - startTime;
     if (prgTime < FADEIN)
     {
-        // set_brightness((prgTime * max_brightness) / FADEIN);
+        digitalLeds_setBrightness((prgTime * max_brightness) / FADEIN);
     }
     else if (prgTime < FADEOUT)
     {
-        // auto brightness = max_brightness;
-        // if (night_mode)
-        //     brightness = std::min(brightness, 64);
-        // set_brightness(brightness);
+        auto brightness = max_brightness;
+        if (night_mode)
+            brightness = std::min(brightness, 64);
+        digitalLeds_setBrightness(brightness);
     }
     else if (prgTime < RUNTIME)
     {
-        // set_brightness(((RUNTIME - prgTime) * max_brightness) / FADETIME);
+        digitalLeds_setBrightness(((RUNTIME - prgTime) * max_brightness) / FADETIME);
     }
     else
     {
@@ -102,7 +98,7 @@ void neomatrix_change_program(const char* name)
     current = p->launch();
     auto_program_switch = false;
     clear_all();
-    set_brightness(max_brightness);
+    digitalLeds_setBrightness(max_brightness);
 }
 
 void neomatrix_next_program()
@@ -124,7 +120,7 @@ void neomatrix_set_speed(int fps)
 void neomatrix_set_brightness(uint8_t brightness)
 {
     max_brightness = brightness;
-    set_brightness(max_brightness);
+    digitalLeds_setBrightness(max_brightness);
 }
 
 void neomatrix_set_nightmode(bool nightmode)
