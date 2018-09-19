@@ -11,7 +11,6 @@
 
 #include "defs.h"
 
-extern strand_t* strands[];
 extern pixelColor_t* pixels[];
 extern uint16_t autonomous_speed;
 
