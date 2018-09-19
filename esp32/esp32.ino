@@ -70,14 +70,15 @@ void setup()
         strands[i].numPixels = NUM_LEDS_PER_STRAND;
         strands[i].pixels = nullptr;
         strands[i]._stateVars = nullptr;
-        if (digitalLeds_initStrands(&strands[i], 1))
-        {
-            Serial.println("Strand init failure");
-            while (1)
-                ;
-        }
-        pixels[i] = strands[i].pixels;
     }
+    if (digitalLeds_initStrands(strands, NUM_OF_STRANDS))
+    {
+        Serial.println("Strand init failure");
+        while (1)
+            ;
+    }
+    for (int i = 0; i < NUM_OF_STRANDS; ++i)
+        pixels[i] = strands[i].pixels;
     
 #if 0
     
@@ -275,11 +276,7 @@ void clear_all()
 void show()
 {
     for (int i = 0; i < NUM_OF_STRANDS; ++i)
-    {
-        Serial.print("num "); Serial.println(strands[i].numPixels); delay(100);
         digitalLeds_updatePixels(&strands[i]);
-        Serial.println("upd done"); delay(100);
-    }
 }
 
 int p = 0;
@@ -307,8 +304,6 @@ void loop()
         if (pressed != button_state)
         {
             button_state = pressed;
-            Serial.print("Button: ");
-            Serial.println(button_state);
             if (button_state)
                 neomatrix_next_program();
         }
