@@ -44,47 +44,13 @@ WiFiUDP Udp;
 constexpr int PixelPins[] = {
     13, 12, 14, 27, 26, 25, 33, 32
 };
-const int ButtonPin = 35;
+const int ButtonPin = 22;
 const int DEBOUNCE_TIME_MS = 100;
 
-void clear_all();
 void show();
 
-#define DEFINE_STRAND(i)                        \
-    strand_t strand_##i = {                     \
-        .rmtChannel = i,                        \
-        .gpioNum = PixelPins[i],                \
-        .ledType = LED_WS2812B_V3,              \
-        .brightLimit = BRIGHTNESS,              \
-        .numPixels = NUM_LEDS_PER_STRAND,       \
-        .pixels = nullptr,                      \
-        ._stateVars = nullptr}
-
-#define ADD_STRAND(i)   strands[i] = &strand_##i
-
-strand_t* strands[NUM_OF_STRANDS];
+strand_t strands[NUM_OF_STRANDS];
 pixelColor_t* pixels[NUM_OF_STRANDS];
-
-DEFINE_STRAND(0);
-#if NUM_OF_STRANDS > 1
-DEFINE_STRAND(1);
-#endif
-#if NUM_OF_STRANDS > 2
-DEFINE_STRAND(2);
-#endif
-#if NUM_OF_STRANDS > 3
-DEFINE_STRAND(3);
-#endif
-#if NUM_OF_STRANDS > 4
-DEFINE_STRAND(4);
-#endif
-#if NUM_OF_STRANDS > 5
-DEFINE_STRAND(5);
-#endif
-#if NUM_OF_STRANDS > 6
-DEFINE_STRAND(6);
-#endif
-
 
 void setup()
 {
@@ -95,35 +61,22 @@ void setup()
 
     pinMode(ButtonPin, INPUT_PULLUP);
 
-    ADD_STRAND(0);
-#if NUM_OF_STRANDS > 1
-    ADD_STRAND(1);
-#endif
-#if NUM_OF_STRANDS > 2
-    ADD_STRAND(2);
-#endif
-#if NUM_OF_STRANDS > 3
-    ADD_STRAND(3);
-#endif
-#if NUM_OF_STRANDS > 4
-    ADD_STRAND(4);
-#endif
-#if NUM_OF_STRANDS > 5
-    ADD_STRAND(5);
-#endif
-#if NUM_OF_STRANDS > 6
-    ADD_STRAND(6);
-#endif
-
     for (int i = 0; i < NUM_OF_STRANDS; ++i)
     {
-        if (digitalLeds_initStrands(strands[i], 1))
+        strands[i].rmtChannel = i;
+        strands[i].gpioNum = PixelPins[i];
+        strands[i].ledType = LED_WS2812B_V3;
+        strands[i].brightLimit = BRIGHTNESS;
+        strands[i].numPixels = NUM_LEDS_PER_STRAND;
+        strands[i].pixels = nullptr;
+        strands[i]._stateVars = nullptr;
+        if (digitalLeds_initStrands(&strands[i], 1))
         {
             Serial.println("Strand init failure");
             while (1)
                 ;
         }
-        pixels[i] = strands[i]->pixels;
+        pixels[i] = strands[i].pixels;
     }
     
 #if 0
@@ -187,7 +140,7 @@ void setup()
     Udp.begin(7890);
 
 #endif
-    
+
     clear_all();
     show();
     neomatrix_init();
@@ -316,13 +269,17 @@ void clientEventUdp()
 void clear_all()
 {
     for (int i = 0; i < NUM_OF_STRANDS; ++i)
-        memset(strands[i]->pixels, 0, NUM_LEDS_PER_STRAND * sizeof(pixelColor_t));
+        memset(pixels[i], 0, NUM_LEDS_PER_STRAND * sizeof(pixelColor_t));
 }
 
 void show()
 {
     for (int i = 0; i < NUM_OF_STRANDS; ++i)
-        digitalLeds_updatePixels(strands[i]);
+    {
+        Serial.print("num "); Serial.println(strands[i].numPixels); delay(100);
+        digitalLeds_updatePixels(&strands[i]);
+        Serial.println("upd done"); delay(100);
+    }
 }
 
 int p = 0;
