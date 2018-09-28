@@ -147,4 +147,4 @@ private:
     uint8_t* heat;
 };
 
-//REGISTER_PROGRAM(Fire);
+REGISTER_PROGRAM(Fire);
