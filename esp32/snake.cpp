@@ -77,6 +77,44 @@ private:
         }
     }
 
+    void change_direction(Direction& dir)
+    {
+        while (1)
+        {
+            const auto new_dir = (Direction) random8(0, DIR_SIZE);
+            bool ok = false;
+            switch (dir)
+            {
+            case DIR_UP:
+                ok = (new_dir != DIR_DOWN);
+                break;
+            case DIR_LEFT:
+                ok = (new_dir != DIR_RIGHT);
+                break;
+            case DIR_FRONT:
+                ok = (new_dir != DIR_BACK);
+                break;
+            case DIR_RIGHT:
+                ok = (new_dir != DIR_RIGHT);
+                break;
+            case DIR_BACK:
+                ok = (new_dir != DIR_FRONT);
+                break;
+            case DIR_DOWN:
+                ok = (new_dir != DIR_UP);
+                break;
+            default:
+                internal_error();
+                break;
+            }
+            if (ok)
+            {
+                dir = new_dir;
+                return;
+            }
+        }
+    }
+
     SnakeData snakes[NOF_SNAKES];
     ChaseColours cc;
 };
@@ -103,9 +141,12 @@ bool Snake::run()
     else
     {
         // Update
+        if (random8(0, 10) < 4)
+            change_direction(s.dir);
+            
         while (limit_hit_imminent(s.dir, s.x, s.y, s.z))
-            // Choose new random direction
-            s.dir = (Direction) random8(0, DIR_SIZE);
+            change_direction(s.dir);
+
         advance(s.dir, s.x, s.y, s.z);
         set_pixel(s.x, s.y, s.z, s.c);
     }
