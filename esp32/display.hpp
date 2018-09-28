@@ -15,9 +15,13 @@ extern pixelColor_t* pixels[];
 extern uint16_t autonomous_speed;
 
 void clear_all();
+void show();
 
 pixelColor_t get_pixel(int idx);
 void set_pixel(int idx, pixelColor_t c);
+void set_pixel(int x, int y, int z, pixelColor_t c);
+void fade_all(int percent);
+void internal_error();
 
 /// Predefined RGB colors
 enum Html_color {

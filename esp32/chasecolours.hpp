@@ -5,14 +5,14 @@
 class ChaseColours
 {
 public:
-    static pixelColor_t get()
+    pixelColor_t get()
     {
         return chase_colours[idx];
     }
 
-    static void next();
+    void next();
 
 private:
-    static int idx;
+    int idx = 0;
     static const pixelColor_t chase_colours[];
 };

@@ -142,14 +142,3 @@ pixelColor_t get_pixel(int idx)
     const int l = idx % NUM_LEDS_PER_STRAND;
     return pixels[s][l];
 }
-
-
-void set_pixel(int idx, pixelColor_t c)
-{
-    const int s = idx/NUM_LEDS_PER_STRAND;
-    if (s > NUM_OF_STRANDS)
-        return;
-    const int l = idx % NUM_LEDS_PER_STRAND;
-    pixels[s][l] = c;
-}
-

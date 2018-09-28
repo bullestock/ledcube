@@ -111,7 +111,7 @@ const ledParams_t ledParamsAll[] = {  // Still must match order of `led_types`
 extern int digitalLeds_initStrands(strand_t strands [], int numStrands);
 extern int digitalLeds_updatePixels(strand_t * strand);
 extern void digitalLeds_resetPixels(strand_t * pStrand);
-    void digitalLeds_setBrightness(int b);
+extern void digitalLeds_setBrightness(int b);
 
 #ifdef __cplusplus
 }

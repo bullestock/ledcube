@@ -47,8 +47,6 @@ constexpr int PixelPins[] = {
 const int ButtonPin = 22;
 const int DEBOUNCE_TIME_MS = 100;
 
-void show();
-
 strand_t strands[NUM_OF_STRANDS];
 pixelColor_t* pixels[NUM_OF_STRANDS];
 
@@ -265,12 +263,6 @@ void clientEventUdp()
             break;
         }
     }
-}
-
-void clear_all()
-{
-    for (int i = 0; i < NUM_OF_STRANDS; ++i)
-        memset(pixels[i], 0, NUM_LEDS_PER_STRAND * sizeof(pixelColor_t));
 }
 
 void show()

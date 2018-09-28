@@ -16,17 +16,30 @@ public:
     {
         if (limiter.skip()) return false;
 
-        if (idx > 0)
-            set_pixel(idx-1, pixelFromRGB(0, 0, 0));
-        if (idx >= NUM_LEDS)
-            idx = 0;
-        set_pixel(idx, pixelFromRGB(0, 255, 0));
-        ++idx;
+        clear_all();
+        set_pixel(x, y, z, pixelFromRGB(0, 255, 0));
+        ++x;
+        if (x >= NUM_LEDS_PER_ROW)
+        {
+            ++y;
+            x = 0;
+        }
+        if (y >= NUM_LEDS_PER_ROW)
+        {
+            ++z;
+            y = 0;
+        }
+        if (z >= NUM_LEDS_PER_ROW)
+        {
+            z = 0;
+        }
         return true;
     }
 
 private:
-    int idx = 0;
+    int x = 0;
+    int y = 0;
+    int z = 0;
 };
 
-REGISTER_PROGRAM(RowTest);
+//REGISTER_PROGRAM(RowTest);

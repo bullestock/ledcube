@@ -99,7 +99,7 @@ class Fire : public Program
 {
 public:
     Fire()
-        : Program(1)
+        : Program(10)
     {
         heat = new uint8_t[NUM_LEDS];
     }
@@ -147,4 +147,4 @@ private:
     uint8_t* heat;
 };
 
-REGISTER_PROGRAM(Fire);
+//REGISTER_PROGRAM(Fire);
