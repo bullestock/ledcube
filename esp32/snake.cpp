@@ -12,7 +12,7 @@ public:
     {
     }
 
-    static const int NOF_SNAKES = 1;
+    static const int NOF_SNAKES = 5;
 
     enum Direction {
         DIR_UP,
@@ -29,7 +29,7 @@ public:
 private:
     struct SnakeData
     {
-        bool active = false;
+        int age = 0;
         int x = 0;
         int y = 0;
         int z = 0;
@@ -123,32 +123,35 @@ bool Snake::run()
 {
     if (limiter.skip()) return false;
 
-    const int idx = 0;
-    auto& s = snakes[idx];
-
-    if (!s.active)
+    for (auto& s : snakes)
     {
-        // Choose random start position and direction
-        s.x = random8(0, NUM_LEDS_PER_ROW);
-        s.y = random8(0, NUM_LEDS_PER_ROW);
-        s.z = random8(0, NUM_LEDS_PER_ROW);
-        s.dir = (Direction) random8(0, DIR_SIZE);
-        s.c = cc.get();
-        cc.next();
-        set_pixel(s.x, s.y, s.z, s.c);
-        s.active = true;
-    }
-    else
-    {
-        // Update
-        if (random8(0, 10) < 4)
-            change_direction(s.dir);
+        // Randomly kill old snakes
+        if (s.age > 50 + random8(0, 100))
+            s.age = 0;
+        if (s.age == 0)
+        {
+            // Initialize: Choose random start position and direction
+            s.x = random8(0, NUM_LEDS_PER_ROW);
+            s.y = random8(0, NUM_LEDS_PER_ROW);
+            s.z = random8(0, NUM_LEDS_PER_ROW);
+            s.dir = (Direction) random8(0, DIR_SIZE);
+            s.c = cc.get();
+            cc.next();
+            set_pixel(s.x, s.y, s.z, s.c);
+        }
+        else
+        {
+            // Update
+            if (random8(0, 10) < 4)
+                change_direction(s.dir);
             
-        while (limit_hit_imminent(s.dir, s.x, s.y, s.z))
-            change_direction(s.dir);
+            while (limit_hit_imminent(s.dir, s.x, s.y, s.z))
+                change_direction(s.dir);
 
-        advance(s.dir, s.x, s.y, s.z);
-        set_pixel(s.x, s.y, s.z, s.c);
+            advance(s.dir, s.x, s.y, s.z);
+            set_pixel(s.x, s.y, s.z, s.c);
+        }
+        ++s.age;
     }
     fade_all(10);
     return true;
