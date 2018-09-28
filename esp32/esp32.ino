@@ -297,7 +297,10 @@ void loop()
         {
             button_state = pressed;
             if (button_state)
+            {
+                clear_all();
                 neomatrix_next_program();
+            }
         }
     last_pressed = pressed;
 }
