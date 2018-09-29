@@ -5,35 +5,29 @@
  * Frame limiter
  */
 
+#include <Arduino.h>
 #include "framelimiter.hpp"
-#include "common.hpp"
 
-FrameLimiter::FrameLimiter(int s)
-    : scale(s)
+FrameLimiter::FrameLimiter(float fps)
 {
-    nextFrame = getCycleCount();
+    last_frame = millis();
     setFps(fps);
 }
 
-void FrameLimiter::setFps(int f)
+void FrameLimiter::setFps(float f)
 {
     fps = f;
-    cyclesPerFrame = HZ / (scale*fps);
+    ms_per_frame = 1000 / fps;
 }
 
 bool FrameLimiter::skip()
 {
-  uint32_t now = getCycleCount();
-  uint32_t untilNextFrame = nextFrame - now;
-  if (untilNextFrame < cyclesPerFrame)
+  const auto now = millis();
+  if (now - last_frame < ms_per_frame)
       return true;
-
-  nextFrame += cyclesPerFrame;
-  untilNextFrame = nextFrame - now;
-  if (untilNextFrame >= cyclesPerFrame)
-      nextFrame = now + cyclesPerFrame;
+  
+  last_frame = now;
 
   return false;
 }
 
-int FrameLimiter::fps = 5;

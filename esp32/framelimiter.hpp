@@ -12,15 +12,14 @@
 class FrameLimiter
 {
 public:
-    FrameLimiter(int scale);
+    FrameLimiter(float fps);
     bool skip();
 
-    void setFps(int fps);
+    void setFps(float fps);
     
 private:
-    int scale;
-    static int fps;
-    uint32_t cyclesPerFrame;
-    uint32_t nextFrame;
+    float fps = 1;
+    unsigned long ms_per_frame = 0;
+    unsigned long last_frame = 0;
 };
 

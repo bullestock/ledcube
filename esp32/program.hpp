@@ -14,7 +14,7 @@ extern uint16_t autonomous_speed;
 class Program
 {
 public:
-    Program(int scale)
+    Program(float scale)
         : limiter(scale)
     {
     }
