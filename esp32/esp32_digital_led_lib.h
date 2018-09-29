@@ -27,12 +27,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef ESP32_DIGITAL_LED_LIB_H
-#define ESP32_DIGITAL_LED_LIB_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #include <stdint.h>
 
@@ -45,6 +40,12 @@ typedef union {
   uint32_t num;
 } pixelColor_t;
 
+inline bool operator==(const pixelColor_t& p1,
+                       const pixelColor_t& p2)
+{
+    return p1.num == p2.num;
+}
+    
 inline pixelColor_t pixelFromRGB(uint8_t r, uint8_t g, uint8_t b)
 {
   pixelColor_t v;
@@ -108,14 +109,7 @@ const ledParams_t ledParamsAll[] = {  // Still must match order of `led_types`
   [LED_SK6812W_V1] = { .bytesPerPixel = 4, .T0H = 300, .T1H = 600, .T0L = 900, .T1L = 600, .TRS =  80000},
 };
 
-extern int digitalLeds_initStrands(strand_t strands [], int numStrands);
-extern int digitalLeds_updatePixels(strand_t * strand);
-extern void digitalLeds_resetPixels(strand_t * pStrand);
-extern void digitalLeds_setBrightness(int b);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* ESP32_DIGITAL_LED_LIB_H */
-
+int digitalLeds_initStrands(strand_t strands [], int numStrands);
+int digitalLeds_updatePixels(strand_t * strand);
+void digitalLeds_resetPixels(strand_t * pStrand);
+void digitalLeds_setBrightness(int b);
