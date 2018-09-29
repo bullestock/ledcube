@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "display.hpp"
 #include "esp32_digital_led_lib.h"
+#include "random8.h"
 
 void set_pixel(int idx, pixelColor_t c)
 {
@@ -11,26 +12,52 @@ void set_pixel(int idx, pixelColor_t c)
     pixels[s][l] = c;
 }
 
-void set_pixel(int x, int y, int z, pixelColor_t c)
+
+pixelColor_t get_pixel(int idx)
 {
-    if ((x < 0) ||
-        (x >= NUM_LEDS_PER_ROW) ||
-        (y < 0) ||
-        (y >= NUM_LEDS_PER_ROW) ||
-        (z < 0) ||
-        (z >= NUM_LEDS_PER_ROW))
+    const int s = idx/NUM_LEDS_PER_STRAND;
+    if (s > NUM_OF_STRANDS)
+        return pixelColor_t();
+    const int l = idx % NUM_LEDS_PER_STRAND;
+    return pixels[s][l];
+}
+
+void check_position(const Position& pos)
+{
+    if ((pos.x < 0) ||
+        (pos.x >= NUM_LEDS_PER_ROW) ||
+        (pos.y < 0) ||
+        (pos.y >= NUM_LEDS_PER_ROW) ||
+        (pos.z < 0) ||
+        (pos.z >= NUM_LEDS_PER_ROW))
     {
         Serial.print("Invalid coordinates: ");
-        Serial.print(x);
+        Serial.print(pos.x);
         Serial.print(", ");
-        Serial.print(y);
+        Serial.print(pos.y);
         Serial.print(", ");
-        Serial.println(z);
+        Serial.println(pos.z);
         internal_error();
-        return;
     }
+}
+
+void set_pixel(const Position& pos, pixelColor_t c)
+{
+    check_position(pos);
     // y = strand
-    pixels[y][z * NUM_OF_STRANDS + x] = c;
+    pixels[pos.y][pos.z * NUM_OF_STRANDS + pos.x] = c;
+}
+
+pixelColor_t get_pixel(const Position& pos)
+{
+    check_position(pos);
+    return pixels[pos.y][pos.z * NUM_OF_STRANDS + pos.x];
+}
+
+bool is_black(const Position& pos)
+{
+    check_position(pos);
+    return pixels[pos.y][pos.z * NUM_OF_STRANDS + pos.x] == pixelFromRGB(0, 0, 0);
 }
 
 void clear_all()
@@ -60,6 +87,92 @@ void internal_error()
         show();
         delay(1000);
         clear_all();
+        show();
         delay(1000);
     }
+}
+
+void change_direction(Direction& dir)
+{
+    Serial.print("change_direction: ");
+    Serial.println(dir);
+    int tries = 0;
+    while (1)
+    {
+        const auto new_dir = (Direction) random8(0, DIR_SIZE);
+        Serial.print("trying ");
+        Serial.println(new_dir);
+        if (!is_opposite(dir, new_dir))
+        {
+            dir = new_dir;
+            Serial.println("accepted");
+            return;
+        }
+        if (++tries > 20)
+        {
+            Serial.print("Cannot find opposite of ");
+            Serial.println(dir);
+            internal_error();
+        }
+    }
+}
+
+bool is_opposite(Direction d1, Direction d2)
+{
+    switch (d1)
+    {
+    case DIR_UP:
+        return (d2 == DIR_DOWN);
+
+    case DIR_LEFT:
+        return (d2 == DIR_RIGHT);
+
+    case DIR_FRONT:
+        return (d2 == DIR_BACK);
+
+    case DIR_RIGHT:
+        return (d2 == DIR_RIGHT);
+
+    case DIR_BACK:
+        return (d2 == DIR_FRONT);
+
+    case DIR_DOWN:
+        return (d2 == DIR_UP);
+
+    default:
+        internal_error();
+        break;
+    }
+    return false;
+}
+
+void scroll(Direction dir)
+{
+    // TODO
+}
+
+Position random_position()
+{
+    return Position(random8(0, NUM_LEDS_PER_ROW),
+                    random8(0, NUM_LEDS_PER_ROW),
+                    random8(0, NUM_LEDS_PER_ROW));
+}
+
+Direction random_direction()
+{
+    return (Direction) random8(0, DIR_SIZE);
+}
+
+pixelColor_t get_wheel_colour(uint8_t pos)
+{
+    pos = 255 - pos;
+    if (pos < 85)
+        return pixelFromRGB(255 - pos * 3, 0, pos * 3);
+    if (pos < 170)
+    {
+        pos -= 85;
+        return pixelFromRGB(0, pos * 3, 255 - pos * 3);
+    }
+    pos -= 170;
+    return pixelFromRGB(pos * 3, 255 - pos * 3, 0);
 }

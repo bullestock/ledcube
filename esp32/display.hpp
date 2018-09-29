@@ -11,6 +11,24 @@
 
 #include "defs.h"
 
+struct Position
+{
+    Position()
+    {
+    }
+
+    Position(int xx, int yy, int zz)
+        : x(xx),
+          y(yy),
+          z(zz)
+    {
+    }
+    
+    int x = 0;
+    int y = 0;
+    int z = 0;
+};
+
 extern pixelColor_t* pixels[];
 extern uint16_t autonomous_speed;
 
@@ -18,8 +36,12 @@ void clear_all();
 void show();
 
 pixelColor_t get_pixel(int idx);
+pixelColor_t get_pixel(const Position& pos);
 void set_pixel(int idx, pixelColor_t c);
 void set_pixel(int x, int y, int z, pixelColor_t c);
+void set_pixel(const Position& pos, pixelColor_t c);
+bool is_black(const Position& pos);
+
 void fade_all(int percent);
 void internal_error();
 
@@ -183,6 +205,27 @@ enum Html_color {
     FairyLightNCC = 0xFF9D2A
 };
 
+enum Direction {
+    DIR_UP,
+    DIR_LEFT,
+    DIR_FRONT,
+    DIR_RIGHT,
+    DIR_BACK,
+    DIR_DOWN,
+    DIR_SIZE
+};
+
+/// Change to a random direction that is not the opposite of the current one.
+void change_direction(Direction& dir);
+
+bool is_opposite(Direction d1, Direction d2);
+
+void scroll(Direction dir);
+
+Position random_position();
+
+Direction random_direction();
+
 inline pixelColor_t pixelFromHex(uint32_t h)
 {
     pixelColor_t v;
@@ -192,3 +235,5 @@ inline pixelColor_t pixelFromHex(uint32_t h)
     v.w = 0;
     return v;
 }
+
+pixelColor_t get_wheel_colour(uint8_t pos);
