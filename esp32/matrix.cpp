@@ -7,7 +7,7 @@ class Matrix : public Program
 {
 public:
     Matrix()
-        : Program(2)
+        : Program(8)
     {
     }
 
