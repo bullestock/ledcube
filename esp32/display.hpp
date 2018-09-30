@@ -222,6 +222,12 @@ bool is_opposite(Direction d1, Direction d2);
 
 void scroll(Direction dir);
 
+enum Axis {
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z
+};
+
 Position random_position();
 
 Direction random_direction();

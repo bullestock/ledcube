@@ -45,7 +45,12 @@ void set_pixel(const Position& pos, pixelColor_t c)
 {
     check_position(pos);
     // y = strand
-    pixels[pos.y][pos.z * NUM_OF_STRANDS + pos.x] = c;
+    pixels[pos.y][pos.z * NUM_LEDS_PER_ROW + pos.x] = c;
+}
+
+void set_pixel(int x, int y, int z, pixelColor_t c)
+{
+    set_pixel(Position(x, y, z), c);
 }
 
 pixelColor_t get_pixel(const Position& pos)
