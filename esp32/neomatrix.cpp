@@ -133,12 +133,3 @@ void neomatrix_start_autorun()
     run_autonomously = true;
     auto_program_switch = true;
 }
-
-pixelColor_t get_pixel(int idx)
-{
-    const int s = idx/NUM_LEDS_PER_STRAND;
-    if (s > NUM_OF_STRANDS)
-        return pixelColor_t();
-    const int l = idx % NUM_LEDS_PER_STRAND;
-    return pixels[s][l];
-}
