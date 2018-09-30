@@ -30,9 +30,7 @@ public:
             y = 0;
         }
         if (z >= NUM_LEDS_PER_ROW)
-        {
             z = 0;
-        }
         return true;
     }
 
