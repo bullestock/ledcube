@@ -71,8 +71,6 @@ void program_loop()
             neomatrix_next_program();
         }
         while (night_mode && !current->allow_night_mode());
-
-        startTime = now;
     }
 }
 
@@ -109,6 +107,7 @@ void neomatrix_next_program()
     current = currentFactory->launch();
     Serial.print("Next: ");
     Serial.println(currentFactory->name);
+    startTime = millis();
  }
 
 void neomatrix_set_speed(int fps)
