@@ -3,6 +3,13 @@
 #include "esp32_digital_led_lib.h"
 #include "random8.h"
 
+bool is_inside(const Position& pos)
+{
+    return (pos.x >= 0) && (pos.x < NUM_LEDS_PER_ROW) &&
+        (pos.y >= 0) && (pos.y < NUM_LEDS_PER_ROW) &&
+       (pos.z >= 0) && (pos.z < NUM_LEDS_PER_ROW);
+}
+
 void set_pixel(int idx, pixelColor_t c)
 {
     const int s = idx/NUM_LEDS_PER_STRAND;
@@ -149,6 +156,46 @@ bool is_opposite(Direction d1, Direction d2)
         break;
     }
     return false;
+}
+
+Position translate(const Position& pos, Direction dir, int amount)
+{
+    Position new_pos = pos;
+    int dx = 0, dy = 0, dz = 0;
+    switch (dir)
+    {
+    case DIR_UP:
+        dz = 1;
+        break;
+
+    case DIR_LEFT:
+        dx = -1;
+        break;
+
+    case DIR_FRONT:
+        dy = 1;
+        break;
+
+    case DIR_RIGHT:
+        dx = 1;
+        break;
+
+    case DIR_BACK:
+        dy = -1;
+        break;
+
+    case DIR_DOWN:
+        dz = -1;
+        break;
+
+    default:
+        internal_error();
+        break;
+    }
+    new_pos.x += dx;
+    new_pos.y += dy;
+    new_pos.z += dz;
+    return new_pos;
 }
 
 void scroll(Direction dir)

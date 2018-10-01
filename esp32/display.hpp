@@ -29,6 +29,9 @@ struct Position
     int z = 0;
 };
 
+// Is this position fully inside the cube?
+bool is_inside(const Position& pos);
+
 extern pixelColor_t* pixels[];
 extern uint16_t autonomous_speed;
 
@@ -221,6 +224,8 @@ void change_direction(Direction& dir);
 bool is_opposite(Direction d1, Direction d2);
 
 void scroll(Direction dir);
+
+Position translate(const Position& pos, Direction dir, int amount);
 
 enum Axis {
     AXIS_X,
