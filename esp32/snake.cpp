@@ -7,12 +7,14 @@
 class Snake : public Program
 {
 public:
+    const int MIN_NOF_SNAKES = 5;
+    static const int MAX_NOF_SNAKES = 15;
+
     Snake()
         : Program(5)
     {
+        nof_snakes = MIN_NOF_SNAKES + random8(0, MAX_NOF_SNAKES - MIN_NOF_SNAKES);
     }
-
-    static const int NOF_SNAKES = 5;
 
     bool run() override;
 
@@ -27,8 +29,7 @@ private:
 
     bool limit_hit_imminent(Direction dir, const Position& pos)
     {
-        auto new_pos = pos;
-        advance(dir, new_pos);
+        auto new_pos = translate(pos, dir, 1);
         if ((new_pos.x < 0) ||
             (new_pos.x >= NUM_LEDS_PER_ROW) ||
             (new_pos.y < 0) ||
@@ -41,35 +42,8 @@ private:
         return p.r + p.g + p.b > 50;
     }
 
-    void advance(Direction dir, Position& pos)
-    {
-        switch (dir)
-        {
-        case DIR_UP:
-            ++pos.z;
-            break;
-        case DIR_LEFT:
-            --pos.x;
-            break;
-        case DIR_FRONT:
-            ++pos.y;
-            break;
-        case DIR_RIGHT:
-            ++pos.x;
-            break;
-        case DIR_BACK:
-            --pos.y;
-            break;
-        case DIR_DOWN:
-            --pos.z;
-            break;
-        default:
-            internal_error();
-            break;
-        }
-    }
-
-    SnakeData snakes[NOF_SNAKES];
+    SnakeData snakes[MAX_NOF_SNAKES];
+    int nof_snakes = 0;
     ChaseColours cc;
 };
 
@@ -77,10 +51,10 @@ bool Snake::run()
 {
     if (limiter.skip()) return false;
 
-    int idx = 0;
-    for (auto& s : snakes)
+    for (int idx = 0; idx < nof_snakes; ++idx)
     {
-        ++idx;
+        auto& s = snakes[idx];
+
         // Randomly kill old snakes
         if (s.age > 50 + random8(0, 100))
             s.age = 0;
@@ -132,7 +106,7 @@ bool Snake::run()
             }
             if (s.age > 0)
             {
-                advance(s.dir, s.pos);
+                s.pos = translate(s.pos, s.dir, 1);
                 set_pixel(s.pos, s.c);
             }
         }
