@@ -43,6 +43,11 @@ void Block::set_colour(pixelColor_t colour)
     show();
 }
 
+Position Block::position() const
+{
+    return pos;
+}
+
 void Block::compute_extent(const Position& p,
                            Position& p1,
                            Position& p2) const
@@ -50,9 +55,9 @@ void Block::compute_extent(const Position& p,
     p1.x = p.x - size.x/2;
     p1.y = p.y - size.y/2;
     p1.z = p.z - size.z/2;
-    p2.x = p.x + (size.x + 1)/2;
-    p2.y = p.y + (size.y + 1)/2;
-    p2.z = p.z + (size.z + 1)/2;
+    p2.x = p.x + size.x/2;
+    p2.y = p.y + size.y/2;
+    p2.z = p.z + size.z/2;
 }
 
 void Block::compute_extent(Position& p1,
