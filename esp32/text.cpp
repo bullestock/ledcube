@@ -3,6 +3,7 @@
 #include "chargen.h"
 #include "display.hpp"
 #include "text.h"
+#include "random8.h"
 
 void Text::show()
 {
@@ -10,7 +11,9 @@ void Text::show()
     {
         clear_all();
         row = 0;
-        cc.next();
+        const int skip = random8(1, 3);
+        for (int i = 0; i < skip; ++i)
+            cc.next();
         if (++idx >= text.length())
             idx = 0;
     }
