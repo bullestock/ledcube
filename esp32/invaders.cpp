@@ -15,6 +15,17 @@ public:
                    3, 3, 1)
     {
         defender.show();
+
+        invaders[0].set_position(Position(invaders_x, 2, 7));
+        invaders[1].set_position(Position(invaders_x + 3, 2, 7));
+        invaders[2].set_position(Position(invaders_x, 6, 7));
+        invaders[3].set_position(Position(invaders_x + 3, 6, 7));
+        for (auto& i : invaders)
+        {
+            i.set_size(Position(2, 2, 2));
+            i.set_colour(pixelFromHex(HotPink));
+            i.show();
+        }
     }
 
     virtual bool run()
@@ -23,7 +34,7 @@ public:
 
         if (move)
         {
-            // Every second time: Move defender
+            // Every second time: Move defender and invaders
         
             while (1)
             {
@@ -43,6 +54,17 @@ public:
                 ++fire_pos.z;
                 firing = true;
             }
+
+            for (auto& i : invaders)
+                i.move(invaders_left ? DIR_LEFT : DIR_RIGHT, 1);
+            if (invaders[0].position().x < 2)
+                invaders_left = false;
+            if (invaders[3].position().x > 6)
+            {
+                invaders_left = true;
+                // move down
+            }
+            
         }
         move = !move;
         
@@ -65,6 +87,9 @@ public:
 
 private:
     Block defender;
+    Block invaders[4];
+    int invaders_x = 1;
+    bool invaders_left = false;
     Position fire_pos;
     bool firing = false;
     pixelColor_t fire_colour = pixelFromHex(FireBrick);
