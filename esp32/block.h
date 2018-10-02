@@ -6,9 +6,9 @@
 class Block
 {
 public:
-    Block(pixelColor_t colour,
-          int cx, int cy, int cz,
-          int x_size, int y_size, int z_size);
+    Block(pixelColor_t colour = pixelFromHex(White),
+          int cx = 0, int cy = 0, int cz = 0,
+          int x_size = 0, int y_size = 0, int z_size = 0);
 
     void show();
     
@@ -16,6 +16,12 @@ public:
     bool move(Direction dir, int amount);
 
     void set_colour(pixelColor_t colour);
+
+    Position position() const;
+
+    void set_position(const Position&);
+
+    void set_size(const Position&);
     
 private:
     void compute_extent(const Position& p,
