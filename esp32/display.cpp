@@ -52,7 +52,7 @@ void set_pixel(const Position& pos, pixelColor_t c)
 {
     check_position(pos);
     // y = strand
-    pixels[pos.y][pos.z * NUM_LEDS_PER_ROW + pos.x] = c;
+    pixels[pos.y][pos.z * NUM_LEDS_PER_ROW + NUM_LEDS_PER_ROW - pos.x - 1] = c;
 }
 
 void set_pixel(int x, int y, int z, pixelColor_t c)
@@ -95,7 +95,7 @@ void internal_error()
     while (1)
     {
         for (int i = 0; i < NUM_LEDS; ++i)
-            set_pixel(i, pixelFromRGB(255, 0, 0));
+            set_pixel(i, pixelFromRGB(32, 0, 0));
         show();
         delay(1000);
         clear_all();
