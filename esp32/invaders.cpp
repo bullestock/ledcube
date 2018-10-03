@@ -7,6 +7,7 @@
 class Invaders : public Program
 {
 public:
+    static const int INVADERS_DOWN_COUNT = 5;
     
     Invaders()
         : Program(4),
@@ -16,15 +17,17 @@ public:
     {
         defender.show();
 
-        invaders[0].set_position(Position(invaders_x, 2, 7));
-        invaders[1].set_position(Position(invaders_x + 3, 2, 7));
-        invaders[2].set_position(Position(invaders_x, 6, 7));
-        invaders[3].set_position(Position(invaders_x + 3, 6, 7));
+        invaders[0].b.set_position(Position(invaders_x + 1, 1, invaders_z));
+        invaders[1].b.set_position(Position(invaders_x + 4, 1, invaders_z));
+        invaders[2].b.set_position(Position(invaders_x + 1, 4, invaders_z));
+        invaders[3].b.set_position(Position(invaders_x + 4, 4, invaders_z));
+        invaders[4].b.set_position(Position(invaders_x + 1, 7, invaders_z));
+        invaders[5].b.set_position(Position(invaders_x + 4, 7, invaders_z));
         for (auto& i : invaders)
         {
-            i.set_size(Position(2, 2, 2));
-            i.set_colour(pixelFromHex(HotPink));
-            i.show();
+            i.b.set_size(Position(2, 2, 2));
+            i.b.set_colour(pixelFromHex(HotPink));
+            i.b.show();
         }
     }
 
@@ -32,9 +35,25 @@ public:
     {
         if (limiter.skip()) return false;
 
-        if (move)
+        if (game_over)
         {
-            // Every second time: Move defender and invaders
+            clear_all();
+            if (++game_over_frame > NUM_LEDS_PER_ROW)
+            {
+                game_over_frame = 0;
+                game_over = false;
+                return true;
+            }
+            Block b(pixelFromHex(LimeGreen),
+                    NUM_LEDS_PER_ROW/2, NUM_LEDS_PER_ROW/2, NUM_LEDS_PER_ROW/2,
+                    game_over_frame, game_over_frame, game_over_frame);
+            b.show();
+            return true;
+        }
+        
+        if (move_defender)
+        {
+            // Every second time: Move defender
         
             while (1)
             {
@@ -55,18 +74,41 @@ public:
                 firing = true;
             }
 
-            for (auto& i : invaders)
-                i.move(invaders_left ? DIR_LEFT : DIR_RIGHT, 1);
-            if (invaders[0].position().x < 2)
-                invaders_left = false;
-            if (invaders[3].position().x > 6)
+            // Every fourth time: Move invaders
+            if (move_invaders)
             {
-                invaders_left = true;
-                // move down
+                if (invaders_down <= 0)
+                {
+                    invaders_down = INVADERS_DOWN_COUNT;
+                    for (auto& i : invaders)
+                        if (i.alive)
+                            i.b.move(DIR_DOWN, 1);
+                    --invaders_z;
+                    if (invaders_z <= 1)
+                        game_over = true;
+                }
+                else
+                {
+                    for (auto& i : invaders)
+                        if (i.alive)
+                            i.b.move(invaders_left ? DIR_LEFT : DIR_RIGHT, 1);
+
+                    invaders_x += invaders_left ? -1 : 1;
+                    if (invaders_x < 1)
+                    {
+                        invaders_left = false;
+                        --invaders_down;
+                    }
+                    if (invaders_x > 2)
+                    {
+                        invaders_left = true;
+                        --invaders_down;
+                    }
+                }
             }
-            
+            move_invaders = !move_invaders;
         }
-        move = !move;
+        move_defender = !move_defender;
         
         if (firing)
         {
@@ -86,14 +128,24 @@ public:
     }
 
 private:
+    bool game_over = false;
+    int game_over_frame = 0;
     Block defender;
-    Block invaders[4];
-    int invaders_x = 1;
+    struct Invader
+    {
+        Block b;
+        bool alive = true;
+    };
+    Invader invaders[6];
+    int invaders_x = 0;
+    int invaders_z = 7;
     bool invaders_left = false;
+    int invaders_down = INVADERS_DOWN_COUNT;
     Position fire_pos;
     bool firing = false;
     pixelColor_t fire_colour = pixelFromHex(FireBrick);
-    bool move = false;
+    bool move_defender = false;
+    bool move_invaders = false;
 };
 
 REGISTER_PROGRAM(Invaders);
