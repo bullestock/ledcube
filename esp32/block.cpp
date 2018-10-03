@@ -87,6 +87,15 @@ void Block::set_size(const Position& p)
     size = p;
 }
 
+bool Block::contains(const Position& p) const
+{
+    Position p1, p2;
+    compute_extent(p1, p2);
+    return (p1.x <= p.x) && (p.x <= p2.x) &&
+       (p1.y <= p.y) && (p.y <= p2.y) &&
+       (p1.z <= p.z) && (p.z <= p2.z);
+}
+
 void Block::compute_extent(const Position& p,
                            Position& p1,
                            Position& p2) const

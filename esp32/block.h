@@ -22,7 +22,9 @@ public:
     void set_position(const Position&);
 
     void set_size(const Position&);
-    
+
+    bool contains(const Position&) const;
+
 private:
     void compute_extent(const Position& p,
                         Position& p1,

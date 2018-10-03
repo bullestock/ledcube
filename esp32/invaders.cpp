@@ -120,6 +120,15 @@ public:
                 --old_pos.z;
                 set_pixel(old_pos, pixelFromRGB(0, 0, 0));
             }
+            // Hit?
+            for (auto& i : invaders)
+                if (i.b.contains(fire_pos))
+                {
+                    i.b.set_colour(pixelFromRGB(0, 0, 0));
+                    i.b.show();
+                    i.alive = false;
+                    break;
+                }
             if (++fire_pos.z > NUM_LEDS_PER_ROW)
                 firing = false;
         }
