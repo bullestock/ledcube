@@ -175,7 +175,7 @@ void CharacterGenerator::draw(Axis axis, int row, char symbol,
             for (int z = 0; z < NUM_LEDS_PER_ROW; ++z)
             {
                 const auto c = mask & bits[x] ? colour : pixelFromRGB(0, 0, 0);
-                set_pixel(NUM_LEDS_PER_ROW - 1 - x, row, z, c);
+                set_pixel(x, row, z, c);
                 mask *=2;
             }
         }
